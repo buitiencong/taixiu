@@ -331,8 +331,7 @@ function simulateRollByShake() {
   if (button.disabled) return;
 
   button.disabled = true;
-  message.textContent = "Đang lắc...";
-  message.classList.remove("tai", "xiu");
+  button.innerText = "Đang lắc...";
 
   // Gọi hàm gốc rồi bật lại nút
   setTimeout(() => {
@@ -363,8 +362,7 @@ function handleUserRoll() {
   if (button.disabled) return;
 
   button.disabled = true;
-  message.textContent = "Đang lắc...";
-  message.classList.remove("tai", "xiu");
+  button.innerText = "Đang lắc...";
 
   setTimeout(() => {
     rollDice();
