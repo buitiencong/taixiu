@@ -3,20 +3,27 @@ function rollDice() {
   const button = document.getElementById("roll-button");
   const area = document.getElementById("dice-area");
 
-  // Giai đoạn bắt đầu lắc
+  // Bắt đầu trạng thái lắc
   messageElem.textContent = "Đang lắc...";
   messageElem.classList.remove("tai", "xiu");
   button.disabled = true;
 
-  // Xoá xúc xắc & bát cũ nếu có
+  // Xoá xúc xắc và bát cũ nếu có
   area.querySelectorAll(".dice").forEach(d => d.remove());
   const oldBowl = document.getElementById("bowl");
   if (oldBowl) oldBowl.remove();
 
-  // Chặn kéo bát trong lúc lắc
-  let allowBowlDrag = false;
+  // Tạo bát NGAY LẬP TỨC nhưng CHƯA cho kéo
+  const bowl = document.createElement("img");
+  bowl.src = "bat.png";
+  bowl.id = "bowl";
+  bowl.style.position = "absolute";
+  bowl.style.left = "0";
+  bowl.style.top = "0";
+  bowl.style.cursor = "not-allowed"; // đổi con trỏ cho rõ là chưa được kéo
+  area.appendChild(bowl);
 
-  // Sinh kết quả ngẫu nhiên theo xác suất
+  // Sau 5s mới sinh xúc xắc và cho kéo bát
   const taiChance = parseInt(document.getElementById("prob-slider").value);
   let total;
   if (Math.random() * 100 < taiChance) {
@@ -37,9 +44,8 @@ function rollDice() {
 
   const diceValues = generateDiceFromTotal(total);
 
-  // Sau 5 giây mới hiển thị xúc xắc và bát
   setTimeout(() => {
-    // Tạo xúc xắc
+    // Hiện xúc xắc
     for (let i = 0; i < 3; i++) {
       const num = diceValues[i];
       const dice = document.createElement("img");
@@ -61,21 +67,16 @@ function rollDice() {
       makeDraggableDice(dice);
     }
 
-    // Thêm bát
-    const bowl = document.createElement("img");
-    bowl.src = "bat.png";
-    bowl.id = "bowl";
-    bowl.style.position = "absolute";
-    bowl.style.left = "0";
-    bowl.style.top = "0";
-    area.appendChild(bowl);
-
-    // Cho phép kéo bát sau khi lắc xong
+    // Bật lại khả năng kéo bát
+    bowl.style.cursor = "grab";
     makeDraggableBowl(bowl);
+
+    // Cho người chơi kéo mở bát
     button.disabled = false;
-    messageElem.textContent = ""; // hoặc giữ nguyên nếu bạn muốn người chơi phải mở bát mới hiện kết quả
-  }, 5000); // 5 giây giả lập lắc
+    messageElem.textContent = ""; // hoặc giữ nguyên nếu bạn muốn họ phải mở bát mới thấy kết quả
+  }, 5000);
 }
+
 
 
 
