@@ -1,9 +1,14 @@
+let isRolling = false;  // Đang lắc hay không
+
 function rollDice() {
+  if (isRolling) return;  // Ngăn lắc chồng
+  isRolling = true;
+
   const button = document.getElementById("roll-button");
   const area = document.getElementById("dice-area");
   const messageElem = document.getElementById("message");
 
-  // Ẩn thông báo kết quả nếu có
+  // Ẩn thông báo
   messageElem.style.display = "none";
   messageElem.classList.remove("tai", "xiu");
 
@@ -11,7 +16,7 @@ function rollDice() {
   button.innerText = "Đang lắc...";
   button.disabled = true;
 
-  // Xoá xúc xắc và bát cũ nếu có
+  // Xoá xúc xắc và bát cũ
   area.querySelectorAll(".dice").forEach(d => d.remove());
   const oldBowl = document.getElementById("bowl");
   if (oldBowl) oldBowl.remove();
@@ -23,7 +28,7 @@ function rollDice() {
   bowl.style.position = "absolute";
   bowl.style.left = "0";
   bowl.style.top = "0";
-  bowl.style.cursor = "not-allowed"; // chưa cho kéo
+  bowl.style.cursor = "not-allowed";
   area.appendChild(bowl);
 
   // Cho bát và đĩa rung nhẹ
@@ -31,7 +36,7 @@ function rollDice() {
   bowl.classList.add("shaking");
   if (plate) plate.classList.add("shaking");
 
-  // Tính tổng điểm theo xác suất
+  // Sinh kết quả theo xác suất
   const taiChance = parseInt(document.getElementById("prob-slider").value);
   let total;
   if (Math.random() * 100 < taiChance) {
@@ -52,7 +57,7 @@ function rollDice() {
 
   const diceValues = generateDiceFromTotal(total);
 
-  // Sau 5 giây: hiện xúc xắc và cho kéo bát
+  // Sau 5 giây: hiển thị xúc xắc
   setTimeout(() => {
     for (let i = 0; i < 3; i++) {
       const num = diceValues[i];
@@ -75,7 +80,7 @@ function rollDice() {
       makeDraggableDice(dice);
     }
 
-    // Dừng hiệu ứng rung
+    // Dừng rung
     bowl.classList.remove("shaking");
     if (plate) plate.classList.remove("shaking");
 
@@ -86,8 +91,10 @@ function rollDice() {
     // Trả lại nút
     button.innerText = "Lắc";
     button.disabled = false;
+    isRolling = false;
   }, 5000);
 }
+
 
 
 
@@ -327,27 +334,17 @@ function detectShake(event) {
 }
 
 function simulateRollByShake() {
-  const button = document.getElementById("roll-button");
-  const message = document.getElementById("message");
-
-  if (button.disabled) return;
-
-  button.disabled = true;
-  button.innerText = "Đang lắc...";
-
-  // Gọi hàm gốc rồi bật lại nút
-  setTimeout(() => {
-    rollDice();
-    setTimeout(() => {
-      button.disabled = false;
-    }, 1000); // thời gian khớp với thời gian lắc trong rollDice
-  }, 300); // độ trễ để người dùng cảm thấy mượt
+  if (isRolling) return;
+  rollDice();
 }
+
 
 
 let hasRequestedMotionPermission = false;
 
 function handleUserRoll() {
+  if (isRolling) return;
+
   if (!hasRequestedMotionPermission && typeof DeviceMotionEvent?.requestPermission === 'function') {
     DeviceMotionEvent.requestPermission().then(state => {
       if (state === 'granted') {
@@ -357,19 +354,6 @@ function handleUserRoll() {
     }).catch(console.error);
   }
 
-  // Bấm nút cũng sẽ gọi lắc
-  const button = document.getElementById("roll-button");
-  const message = document.getElementById("message");
-
-  if (button.disabled) return;
-
-  button.disabled = true;
-  button.innerText = "Đang lắc...";
-
-  setTimeout(() => {
-    rollDice();
-    setTimeout(() => {
-      button.disabled = false;
-    }, 1000);
-  }, 300);
+  rollDice();
 }
+
