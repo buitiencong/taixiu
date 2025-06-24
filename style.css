@@ -1,0 +1,70 @@
+html, body {
+  height: 100%;
+  overflow: hidden;  /* ❗ Chặn cuộn */
+  touch-action: none; /* Ngăn kéo vuốt */
+  overscroll-behavior: none; /* Chặn hiệu ứng cuộn vượt giới hạn */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f8ff;
+  padding: 30px;
+}
+
+#question-container {
+  margin-bottom: 20px;
+}
+
+#bridge-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+  align-items: end;
+  margin-top: 30px;
+  gap: 0;
+  padding: 0;
+}
+
+
+#bridge-container img {
+  width: 100px;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+#message {
+  margin-top: 20px;
+  font-weight: bold;
+  color: green;
+}
+
+@keyframes fallIn {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.bridge-segment {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.bridge-segment.fall-in {
+  animation: fallIn 0.5s ease forwards;
+}
+
+.bridge-bank {
+  width: 60px;
+  height: auto;
+}
