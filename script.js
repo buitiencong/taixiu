@@ -1,11 +1,14 @@
 function rollDice() {
-  const messageElem = document.getElementById("message");
   const button = document.getElementById("roll-button");
   const area = document.getElementById("dice-area");
+  const messageElem = document.getElementById("message");
 
-  // Bắt đầu lắc
-  messageElem.textContent = "Đang lắc...";
+  // Ẩn thông báo kết quả nếu có
+  messageElem.textContent = "";
   messageElem.classList.remove("tai", "xiu");
+
+  // Đổi nội dung nút và disable
+  button.innerText = "Đang lắc...";
   button.disabled = true;
 
   // Xoá xúc xắc và bát cũ nếu có
@@ -13,22 +16,22 @@ function rollDice() {
   const oldBowl = document.getElementById("bowl");
   if (oldBowl) oldBowl.remove();
 
-  // Tạo bát
+  // Tạo lại bát (hiện ngay)
   const bowl = document.createElement("img");
   bowl.src = "bat.png";
   bowl.id = "bowl";
   bowl.style.position = "absolute";
   bowl.style.left = "0";
   bowl.style.top = "0";
-  bowl.style.cursor = "not-allowed";
+  bowl.style.cursor = "not-allowed"; // chưa cho kéo
   area.appendChild(bowl);
 
-  // Thêm class shaking cho bát và đĩa
-  bowl.classList.add("shaking");
+  // Cho bát và đĩa rung nhẹ
   const plate = document.getElementById("plate");
+  bowl.classList.add("shaking");
   if (plate) plate.classList.add("shaking");
 
-  // Chuẩn bị dữ liệu xúc xắc
+  // Tính tổng điểm theo xác suất
   const taiChance = parseInt(document.getElementById("prob-slider").value);
   let total;
   if (Math.random() * 100 < taiChance) {
@@ -49,7 +52,7 @@ function rollDice() {
 
   const diceValues = generateDiceFromTotal(total);
 
-  // Sau 5s, hiện xúc xắc và cho kéo bát
+  // Sau 5 giây: hiện xúc xắc và cho kéo bát
   setTimeout(() => {
     for (let i = 0; i < 3; i++) {
       const num = diceValues[i];
@@ -72,15 +75,17 @@ function rollDice() {
       makeDraggableDice(dice);
     }
 
-    // Dừng lắc
+    // Dừng hiệu ứng rung
     bowl.classList.remove("shaking");
     if (plate) plate.classList.remove("shaking");
 
-    // Cho kéo bát
+    // Cho phép kéo bát
     bowl.style.cursor = "grab";
     makeDraggableBowl(bowl);
+
+    // Trả lại nút
+    button.innerText = "Lắc";
     button.disabled = false;
-    messageElem.textContent = ""; // hoặc giữ nguyên nếu cần
   }, 5000);
 }
 
