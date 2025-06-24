@@ -43,10 +43,16 @@ body {
 }
 
 #message {
-  font-size: 24px;         /* Cỡ chữ */
-  font-weight: bold;       /* In đậm */
-  color: #333;             /* Màu mặc định (nếu JS không đổi) */
-  margin-top: 20px;        /* Khoảng cách với nút lắc */
-  height: 40px;            /* Chiều cao cố định để không nhảy layout */
-  transition: all 0.3s;    /* Mượt khi thay đổi nội dung */
+  font-size: 28px;
+  font-weight: bold;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.tai {
+  color: red;
+}
+
+.xiu {
+  color: green;
 }
