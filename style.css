@@ -82,3 +82,25 @@ body {
 #roll-button:active {
   transform: scale(0.97);        /* Nhỏ lại nhẹ khi nhấn */
 }
+
+#probability-control {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #f0f0f0;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+#prob-slider {
+  width: 80%;
+  max-width: 400px;
+}
+
+#prob-label {
+  margin: 0 0 6px;
+  font-weight: bold;
+}

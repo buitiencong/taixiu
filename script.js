@@ -1,5 +1,9 @@
 function rollDice() {
-  document.getElementById("message").textContent = "";
+  // Xoá thông báo cũ
+  const messageElem = document.getElementById("message");
+  messageElem.textContent = "";
+  messageElem.classList.remove("tai", "xiu");
+
   const area = document.getElementById("dice-area");
 
   // Xoá xúc xắc và bát cũ nếu có
@@ -9,30 +13,53 @@ function rollDice() {
   const oldBowl = document.getElementById("bowl");
   if (oldBowl) oldBowl.remove();
 
-  // Tạo 3 xúc xắc ngẫu nhiên
+  // Lấy xác suất ra Tài từ thanh trượt
+  const taiChance = parseInt(document.getElementById("prob-slider").value);
+
+  // Sinh tổng điểm theo xác suất Tài/Xỉu
+  let total;
+  if (Math.random() * 100 < taiChance) {
+    // Ép ra Tài (tổng > 10)
+    do {
+      total = 0;
+      for (let j = 0; j < 3; j++) {
+        total += Math.floor(Math.random() * 6) + 1;
+      }
+    } while (total <= 10);
+  } else {
+    // Ép ra Xỉu (tổng ≤ 10)
+    do {
+      total = 0;
+      for (let j = 0; j < 3; j++) {
+        total += Math.floor(Math.random() * 6) + 1;
+      }
+    } while (total > 10);
+  }
+
+  // Tách tổng thành 3 viên xúc xắc
+  const diceValues = generateDiceFromTotal(total);
+
+  // Tạo 3 viên xúc xắc
   for (let i = 0; i < 3; i++) {
-    const num = Math.floor(Math.random() * 6) + 1;
+    const num = diceValues[i];
     const dice = document.createElement("img");
     dice.src = `${num}.png`;
     dice.classList.add("dice");
 
-    // Vị trí ngẫu nhiên trên đĩa
-    const areaSize = 300; // #dice-area width & height
+    // Vị trí trong vùng 50% giữa đĩa
+    const areaSize = 300;
     const usableRatio = 0.5;
     const usableSize = areaSize * usableRatio;
     const margin = (areaSize - usableSize) / 2;
 
-    const posX = margin + Math.random() * (usableSize - 60); // 60 = viên xúc xắc rộng
+    const posX = margin + Math.random() * (usableSize - 60);
     const posY = margin + Math.random() * (usableSize - 60);
-
 
     dice.style.position = "absolute";
     dice.style.left = `${posX}px`;
     dice.style.top = `${posY}px`;
 
     area.appendChild(dice);
-
-    // Cho phép kéo từng viên xúc xắc, giới hạn trong đĩa
     makeDraggableDice(dice);
   }
 
@@ -45,9 +72,10 @@ function rollDice() {
   bowl.style.top = "0";
   area.appendChild(bowl);
 
-  // Cho phép kéo bát thoải mái, không giới hạn vùng
+  // Cho phép kéo bát thoải mái
   makeDraggableBowl(bowl);
 }
+
 
 
 // Hàm cho phép kéo tự do bát (không giới hạn)
@@ -227,3 +255,21 @@ function makeDraggableDice(elem) {
   }
 }
 
+
+// Thanh trượt
+const slider = document.getElementById("prob-slider");
+const label = document.getElementById("prob-label");
+
+slider.addEventListener("input", () => {
+  label.textContent = `Xác suất ra Tài: ${slider.value}%`;
+});
+
+// Tạo xúc sắc theo thanh trượt
+function generateDiceFromTotal(total) {
+  while (true) {
+    const a = Math.floor(Math.random() * 6) + 1;
+    const b = Math.floor(Math.random() * 6) + 1;
+    const c = total - a - b;
+    if (c >= 1 && c <= 6) return [a, b, c];
+  }
+}
