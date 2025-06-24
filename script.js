@@ -273,3 +273,60 @@ function generateDiceFromTotal(total) {
     if (c >= 1 && c <= 6) return [a, b, c];
   }
 }
+
+
+// LẮC ĐIỆN THOẠI ĐỂ LẮC XÚC XẮC
+let lastShakeTime = 0;
+const shakeThreshold = 25; // có thể chỉnh lên 30 nếu quá nhạy
+const shakeCooldown = 2000; // ms
+
+function initShakeListener() {
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission()
+      .then(state => {
+        if (state === 'granted') {
+          window.addEventListener('devicemotion', detectShake);
+        } else {
+          alert("Không được cấp quyền cảm biến chuyển động.");
+        }
+      })
+      .catch(console.error);
+  } else {
+    window.addEventListener('devicemotion', detectShake);
+  }
+}
+
+function detectShake(event) {
+  const acc = event.accelerationIncludingGravity;
+  if (!acc) return;
+
+  const force = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
+  const now = Date.now();
+
+  if (force > shakeThreshold && now - lastShakeTime > shakeCooldown) {
+    lastShakeTime = now;
+    simulateRollByShake();
+  }
+}
+
+function simulateRollByShake() {
+  const button = document.getElementById("roll-button");
+  const message = document.getElementById("message");
+
+  if (button.disabled) return;
+
+  button.disabled = true;
+  message.textContent = "Đang lắc...";
+  message.classList.remove("tai", "xiu");
+
+  // Gọi hàm gốc rồi bật lại nút
+  setTimeout(() => {
+    rollDice();
+    setTimeout(() => {
+      button.disabled = false;
+    }, 1000); // thời gian khớp với thời gian lắc trong rollDice
+  }, 300); // độ trễ để người dùng cảm thấy mượt
+}
+
+// Tự động bật sau khi trang tải
+window.addEventListener("load", initShakeListener);
