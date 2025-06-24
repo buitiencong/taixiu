@@ -1,3 +1,11 @@
+html, body {
+  overscroll-behavior: none;
+  overflow: hidden;
+  height: 100%;
+  touch-action: none; /* Chặn vuốt xuống, zoom, double-tap */
+}
+
+
 body {
   text-align: center;
   font-family: Arial, sans-serif;
@@ -94,7 +102,7 @@ body {
 
 #probability-control {
   position: fixed;
-  bottom: 20px;
+  bottom: 30px;
   left: 0;
   width: 100%;
   background: #f0f0f0;
