@@ -93,7 +93,7 @@ function rollDice() {
     button.innerText = "Lắc";
     button.disabled = false;
     isRolling = false;
-  }, 5000);
+  }, 3000);
 }
 
 
