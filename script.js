@@ -3,6 +3,7 @@ let isRolling = false;  // Đang lắc hay không
 function rollDice() {
   if (isRolling) return;  // Ngăn lắc chồng
   isRolling = true;
+  playRollSound(); // ✅ phát âm thanh
 
   const button = document.getElementById("roll-button");
   const area = document.getElementById("dice-area");
@@ -355,5 +356,17 @@ function handleUserRoll() {
   }
 
   rollDice();
+}
+
+
+// Phát âm thanh
+const rollSound = new Audio('sound.mp3');
+
+function playRollSound() {
+  rollSound.currentTime = 0; // Đảm bảo âm thanh phát lại từ đầu
+  rollSound.play().catch(err => {
+    // iOS có thể chặn nếu chưa có tương tác người dùng
+    console.warn("Không thể phát âm thanh:", err);
+  });
 }
 
