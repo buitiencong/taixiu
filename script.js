@@ -330,3 +330,34 @@ function simulateRollByShake() {
 
 // Tự động bật sau khi trang tải
 window.addEventListener("load", initShakeListener);
+
+
+let hasRequestedMotionPermission = false;
+
+function handleUserRoll() {
+  if (!hasRequestedMotionPermission && typeof DeviceMotionEvent?.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(state => {
+      if (state === 'granted') {
+        window.addEventListener('devicemotion', detectShake);
+        hasRequestedMotionPermission = true;
+      }
+    }).catch(console.error);
+  }
+
+  // Bấm nút cũng sẽ gọi lắc
+  const button = document.getElementById("roll-button");
+  const message = document.getElementById("message");
+
+  if (button.disabled) return;
+
+  button.disabled = true;
+  message.textContent = "Đang lắc...";
+  message.classList.remove("tai", "xiu");
+
+  setTimeout(() => {
+    rollDice();
+    setTimeout(() => {
+      button.disabled = false;
+    }, 1000);
+  }, 300);
+}
