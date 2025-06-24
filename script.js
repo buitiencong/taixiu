@@ -3,7 +3,7 @@ function rollDice() {
   const button = document.getElementById("roll-button");
   const area = document.getElementById("dice-area");
 
-  // Bắt đầu trạng thái lắc
+  // Bắt đầu lắc
   messageElem.textContent = "Đang lắc...";
   messageElem.classList.remove("tai", "xiu");
   button.disabled = true;
@@ -13,17 +13,22 @@ function rollDice() {
   const oldBowl = document.getElementById("bowl");
   if (oldBowl) oldBowl.remove();
 
-  // Tạo bát NGAY LẬP TỨC nhưng CHƯA cho kéo
+  // Tạo bát
   const bowl = document.createElement("img");
   bowl.src = "bat.png";
   bowl.id = "bowl";
   bowl.style.position = "absolute";
   bowl.style.left = "0";
   bowl.style.top = "0";
-  bowl.style.cursor = "not-allowed"; // đổi con trỏ cho rõ là chưa được kéo
+  bowl.style.cursor = "not-allowed";
   area.appendChild(bowl);
 
-  // Sau 5s mới sinh xúc xắc và cho kéo bát
+  // Thêm class shaking cho bát và đĩa
+  bowl.classList.add("shaking");
+  const plate = document.getElementById("plate");
+  if (plate) plate.classList.add("shaking");
+
+  // Chuẩn bị dữ liệu xúc xắc
   const taiChance = parseInt(document.getElementById("prob-slider").value);
   let total;
   if (Math.random() * 100 < taiChance) {
@@ -44,8 +49,8 @@ function rollDice() {
 
   const diceValues = generateDiceFromTotal(total);
 
+  // Sau 5s, hiện xúc xắc và cho kéo bát
   setTimeout(() => {
-    // Hiện xúc xắc
     for (let i = 0; i < 3; i++) {
       const num = diceValues[i];
       const dice = document.createElement("img");
@@ -67,13 +72,15 @@ function rollDice() {
       makeDraggableDice(dice);
     }
 
-    // Bật lại khả năng kéo bát
+    // Dừng lắc
+    bowl.classList.remove("shaking");
+    if (plate) plate.classList.remove("shaking");
+
+    // Cho kéo bát
     bowl.style.cursor = "grab";
     makeDraggableBowl(bowl);
-
-    // Cho người chơi kéo mở bát
     button.disabled = false;
-    messageElem.textContent = ""; // hoặc giữ nguyên nếu bạn muốn họ phải mở bát mới thấy kết quả
+    messageElem.textContent = ""; // hoặc giữ nguyên nếu cần
   }, 5000);
 }
 
