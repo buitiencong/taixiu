@@ -62,8 +62,8 @@ body {
 
 
 #roll-button {
-  background-color: #28a745;     /* Màu nền xanh lá */
-  color: white;                  /* Màu chữ */
+  background-color: #28a745;
+  color: white;
   font-size: 20px;
   font-weight: bold;
   padding: 12px 24px;
@@ -73,9 +73,13 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   transition: background-color 0.3s, transform 0.2s;
   margin-top: 20px;
-  position: relative;  /* hoặc absolute/fixed nếu bạn muốn đặt ở góc màn hình */
-  z-index: 1000;       /* cao hơn các thành phần khác */
+
+  /* Ngăn chọn chữ khi giữ chuột */
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none;     /* IE/Edge */
 }
+
 
 #roll-button:hover {
   background-color: #218838;     /* Màu khi hover */
