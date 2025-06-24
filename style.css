@@ -56,3 +56,29 @@ body {
 .xiu {
   color: green;
 }
+
+
+#roll-button {
+  background-color: #28a745;     /* Màu nền xanh lá */
+  color: white;                  /* Màu chữ */
+  font-size: 20px;
+  font-weight: bold;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 20px;
+  position: relative;  /* hoặc absolute/fixed nếu bạn muốn đặt ở góc màn hình */
+  z-index: 1000;       /* cao hơn các thành phần khác */
+}
+
+#roll-button:hover {
+  background-color: #218838;     /* Màu khi hover */
+  transform: scale(1.05);        /* Phóng to nhẹ khi hover */
+}
+
+#roll-button:active {
+  transform: scale(0.97);        /* Nhỏ lại nhẹ khi nhấn */
+}

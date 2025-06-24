@@ -1,4 +1,5 @@
 function rollDice() {
+  document.getElementById("message").textContent = "";
   const area = document.getElementById("dice-area");
 
   // Xoá xúc xắc và bát cũ nếu có
@@ -16,8 +17,14 @@ function rollDice() {
     dice.classList.add("dice");
 
     // Vị trí ngẫu nhiên trên đĩa
-    const posX = 60 + Math.random() * 120; // khoảng trong đĩa
-    const posY = 80 + Math.random() * 100;
+    const areaSize = 300; // #dice-area width & height
+    const usableRatio = 0.5;
+    const usableSize = areaSize * usableRatio;
+    const margin = (areaSize - usableSize) / 2;
+
+    const posX = margin + Math.random() * (usableSize - 60); // 60 = viên xúc xắc rộng
+    const posY = margin + Math.random() * (usableSize - 60);
+
 
     dice.style.position = "absolute";
     dice.style.left = `${posX}px`;
@@ -76,52 +83,74 @@ function makeDraggableBowl(elem) {
     document.addEventListener("touchend", stopDrag);
   }
 
-function onDrag(e) {
-  if (!isDragging) return;
 
-  e.preventDefault();
+    function onDrag(e) {
+    if (!isDragging) return;
 
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    e.preventDefault();
 
-  const area = document.getElementById("dice-area");
-  const rect = area.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  let newLeft = clientX - rect.left - offsetX;
-  let newTop = clientY - rect.top - offsetY;
+    const area = document.getElementById("dice-area");
+    const rect = area.getBoundingClientRect();
 
-  elem.style.position = "absolute";
-  elem.style.left = `${newLeft}px`;
-  elem.style.top = `${newTop}px`;
+    let newLeft = clientX - rect.left - offsetX;
+    let newTop = clientY - rect.top - offsetY;
 
-  // Kiểm tra nếu bát nằm ngoài đĩa
-  const bowlRect = elem.getBoundingClientRect();
-  const plateRect = rect; // hoặc: document.getElementById("plate").getBoundingClientRect();
+    elem.style.position = "absolute";
+    elem.style.left = `${newLeft}px`;
+    elem.style.top = `${newTop}px`;
 
-  const isOut =
-    bowlRect.right < plateRect.left ||
-    bowlRect.left > plateRect.right ||
-    bowlRect.bottom < plateRect.top ||
-    bowlRect.top > plateRect.bottom;
+    // Lấy bounding box của bát
+    const rawRect = elem.getBoundingClientRect();
+    const paddingRatio = 0.15; // chỉnh nhỏ hoặc lớn hơn nếu cần
+    const bowlRect = {
+      left: rawRect.left + rawRect.width * paddingRatio,
+      right: rawRect.right - rawRect.width * paddingRatio,
+      top: rawRect.top + rawRect.height * paddingRatio,
+      bottom: rawRect.bottom - rawRect.height * paddingRatio
+    };
 
-  const messageElem = document.getElementById("message");
-  if (isOut) {
-    // Tính tổng 3 viên xúc xắc
     const diceImgs = document.querySelectorAll(".dice");
-    let total = 0;
-    diceImgs.forEach(dice => {
-      const match = dice.src.match(/(\d)\.png$/);
-      if (match) total += parseInt(match[1]);
-    });
-    // messageElem.textContent = `🎲 Tổng điểm: ${total}`;
-    const result = total > 10 ? "🎲 Tài" : "🎲 Xỉu";
-    messageElem.textContent = result;
 
-    messageElem.style.color = "green";
-  } else {
-    messageElem.textContent = "";
+    // Kiểm tra xem tâm của từng viên xúc xắc có nằm trong bát không
+    let anyCovered = false;
+    diceImgs.forEach(dice => {
+      const diceRect = dice.getBoundingClientRect();
+      const centerX = diceRect.left + diceRect.width / 2;
+      const centerY = diceRect.top + diceRect.height / 2;
+
+      const isInside =
+        centerX >= bowlRect.left &&
+        centerX <= bowlRect.right &&
+        centerY >= bowlRect.top &&
+        centerY <= bowlRect.bottom;
+
+      if (isInside) anyCovered = true;
+    });
+
+    const messageElem = document.getElementById("message");
+
+    if (!anyCovered) {
+      // Không che tâm viên nào → hiện kết quả
+      let total = 0;
+      diceImgs.forEach(dice => {
+        const match = dice.src.match(/(\d)\.png$/);
+        if (match) total += parseInt(match[1]);
+      });
+
+      const result = total > 10 ? "🎲 Tài" : "🎲 Xỉu";
+      messageElem.textContent = result;
+
+      // Xóa class cũ, thêm class mới
+      messageElem.classList.remove("tai", "xiu");
+      messageElem.classList.add(result.includes("Tài") ? "tai" : "xiu");
+
+    } else {
+      messageElem.textContent = "";
+    }
   }
-}
 
 
 
