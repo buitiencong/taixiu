@@ -328,9 +328,6 @@ function simulateRollByShake() {
   }, 300); // độ trễ để người dùng cảm thấy mượt
 }
 
-// Tự động bật sau khi trang tải
-window.addEventListener("load", initShakeListener);
-
 
 let hasRequestedMotionPermission = false;
 
