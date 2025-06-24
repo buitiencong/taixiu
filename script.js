@@ -4,7 +4,7 @@ function rollDice() {
   const messageElem = document.getElementById("message");
 
   // Ẩn thông báo kết quả nếu có
-  messageElem.textContent = "";
+  messageElem.style.display = "none";
   messageElem.classList.remove("tai", "xiu");
 
   // Đổi nội dung nút và disable
@@ -184,7 +184,9 @@ function makeDraggableBowl(elem) {
       });
 
       const result = total > 10 ? "🎲 Tài" : "🎲 Xỉu";
+      messageElem.style.display = "block";
       messageElem.textContent = result;
+
 
       // Xóa class cũ, thêm class mới
       messageElem.classList.remove("tai", "xiu");
