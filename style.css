@@ -1,70 +1,52 @@
-html, body {
-  height: 100%;
-  overflow: hidden;  /* ❗ Chặn cuộn */
-  touch-action: none; /* Ngăn kéo vuốt */
-  overscroll-behavior: none; /* Chặn hiệu ứng cuộn vượt giới hạn */
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #f0f8ff;
-  padding: 30px;
-}
-
-#question-container {
-  margin-bottom: 20px;
-}
-
-#bridge-container {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  justify-items: center;
-  align-items: end;
-  margin-top: 30px;
-  gap: 0;
-  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
 }
 
 
-#bridge-container img {
-  width: 100px;
+#dice-area {
+  position: relative;
+  width: 300px;  /* hoặc theo kích thước ảnh đĩa */
+  height: 300px;
+  margin: auto;
+  user-select: none;
+  overflow: visible;
+  border: none;
+}
+
+#plate {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: auto;
-  margin: 0;
-  padding: 0;
+  z-index: 1;
 }
 
+.dice {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  cursor: grab;
+  z-index: 2; /* Nằm trên đĩa, dưới bát */
+}
 
+#bowl {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  top: 0;
+  left: 0;
+  cursor: grab;
+  z-index: 3; /* Nằm trên tất cả */
+}
 
 #message {
-  margin-top: 20px;
-  font-weight: bold;
-  color: green;
-}
-
-@keyframes fallIn {
-  0% {
-    transform: translateY(-50px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.bridge-segment {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.bridge-segment.fall-in {
-  animation: fallIn 0.5s ease forwards;
-}
-
-.bridge-bank {
-  width: 60px;
-  height: auto;
+  font-size: 24px;         /* Cỡ chữ */
+  font-weight: bold;       /* In đậm */
+  color: #333;             /* Màu mặc định (nếu JS không đổi) */
+  margin-top: 20px;        /* Khoảng cách với nút lắc */
+  height: 40px;            /* Chiều cao cố định để không nhảy layout */
+  transition: all 0.3s;    /* Mượt khi thay đổi nội dung */
 }

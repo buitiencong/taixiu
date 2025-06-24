@@ -2,13 +2,13 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Tí học Toán</title>
+  <title>Tại xỉu Soyang</title>
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Tí học Toán">
-  <link rel="apple-touch-icon" href="icon-512.png">
-  <link rel="icon" href="icon-192.png" type="image/png">
+  <meta name="apple-mobile-web-app-title" content="Tài xỉu Soyang">
+  <link rel="apple-touch-icon" href="1.png">
+  <link rel="icon" href="1.png" type="image/png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script defer src="script.js"></script>
@@ -21,19 +21,14 @@
   </style>
 </head>
 <body>
-  <h1>Game Xây Cầu</h1>
+  <h1>Tài xỉu Soyang</h1>
 
-  <div id="question-container">
-    <p id="question">Câu hỏi</p>
-    <input id="answer" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Nhập đáp án..."/>
-    <button id="submit">Trả lời</button>
+  <div id="dice-area">
+    <img src="dia.png" id="plate">
+    <!-- Xúc xắc và bát sẽ chèn bằng JS -->
   </div>
 
-<div id="bridge-container">
-  <img src="left-bank.jpg" class="bridge-bank" id="left-bank">
-  <!-- Các mảnh cầu sẽ được thêm bằng JavaScript -->
-  <img src="right-bank.jpg" class="bridge-bank" id="right-bank">
-</div>
+  <button onclick="rollDice()">Lắc</button>
 
 
   <p id="message"></p>
