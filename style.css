@@ -140,7 +140,7 @@ body {
 #sound-toggle {
   position: fixed;
   top: 10px;
-  left: 10px;
+  right: 10px;
   background: white;
   border: none;
   padding: 6px;
