@@ -13,71 +13,41 @@ function rollDice() {
   messageElem.style.display = "none";
   messageElem.classList.remove("tai", "xiu");
 
-  // Đổi nút
+  // Đổi nội dung nút và disable
   button.innerText = "Đang lắc...";
   button.disabled = true;
 
   // Xoá xúc xắc và bát cũ
   area.querySelectorAll(".dice").forEach(d => d.remove());
-  document.getElementById("bowl")?.remove();
-  document.getElementById("bowl-handle")?.remove();
+  const oldBowl = document.getElementById("bowl");
+  if (oldBowl) oldBowl.remove();
 
-  // Tạo ảnh bát
+  // Tạo lại bát nhưng chờ ảnh load xong mới xử lý tiếp
   const bowl = document.createElement("img");
   bowl.src = "bat.png";
   bowl.id = "bowl";
   bowl.style.position = "absolute";
   bowl.style.left = "0";
   bowl.style.top = "0";
-  bowl.style.pointerEvents = "none"; // không bắt sự kiện
-  bowl.style.zIndex = "3";
+  bowl.style.cursor = "not-allowed";
 
   bowl.onload = () => {
     area.appendChild(bowl);
 
-    // Lấy kích thước và vị trí thật sự của bowl trong vùng dice-area
-    const bowlRect = bowl.getBoundingClientRect();
-    const areaRect = area.getBoundingClientRect();
-
-    const left = bowlRect.left - areaRect.left;
-    const top = bowlRect.top - areaRect.top;
-    const width = bowlRect.width;
-    const height = bowlRect.height;
-
-    // Tạo vùng kéo tương ứng
-    const handle = document.createElement("div");
-    handle.id = "bowl-handle";
-    handle.style.position = "absolute";
-    handle.style.left = `${left}px`;
-    handle.style.top = `${top}px`;
-    handle.style.width = `${width}px`;
-    handle.style.height = `${height}px`;
-    handle.style.borderRadius = "50%"; // hình tròn/ellipse
-    handle.style.cursor = "grab";
-    handle.style.zIndex = "4";
-    handle.style.background = "transparent";
-    area.appendChild(handle);
-
-    // Gán sự kiện kéo cho handle
-    makeDraggableBowlHandle(handle, bowl);
-
-    // Rung bát và đĩa
     const plate = document.getElementById("plate");
     bowl.classList.add("shaking");
     if (plate) plate.classList.add("shaking");
 
-    continueDiceRoll(); // tiếp tục xử lý lắc
+    continueDiceRoll(); // xử lý tiếp phần sau
   };
 
   bowl.onerror = () => {
-    console.error("Không tải được bat.png");
+    console.error("Không thể tải ảnh bat.png");
     isRolling = false;
     button.disabled = false;
     button.innerText = "Lắc lại";
   };
 }
-
-
 
 
 function continueDiceRoll() {
@@ -140,104 +110,6 @@ function continueDiceRoll() {
   }, 3000);
 }
 
-// Tạo vùng chọn đè lên bát để bắt sự kiện di chuyển bát
-function makeDraggableBowlHandle(handle, bowl) {
-  let offsetX = 0, offsetY = 0;
-  let isDragging = false;
-
-  handle.addEventListener("mousedown", startDrag);
-  handle.addEventListener("touchstart", startDrag, { passive: false });
-
-  function startDrag(e) {
-    e.preventDefault();
-    isDragging = true;
-    handle.style.cursor = "grabbing";
-
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-    const rect = handle.getBoundingClientRect();
-    offsetX = clientX - rect.left;
-    offsetY = clientY - rect.top;
-
-    document.addEventListener("mousemove", onDrag);
-    document.addEventListener("mouseup", stopDrag);
-    document.addEventListener("touchmove", onDrag, { passive: false });
-    document.addEventListener("touchend", stopDrag);
-  }
-
-  function onDrag(e) {
-    if (!isDragging) return;
-    e.preventDefault();
-
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-    const area = document.getElementById("dice-area");
-    const rect = area.getBoundingClientRect();
-
-    let newLeft = clientX - rect.left - offsetX;
-    let newTop = clientY - rect.top - offsetY;
-
-    // Cập nhật vị trí cho cả handle và ảnh bowl
-    handle.style.left = `${newLeft}px`;
-    handle.style.top = `${newTop}px`;
-    bowl.style.left = `${newLeft}px`;
-    bowl.style.top = `${newTop}px`;
-
-    // Kiểm tra che xúc xắc
-    const rawRect = handle.getBoundingClientRect();
-    const paddingRatio = 0.15;
-    const bowlRect = {
-      left: rawRect.left + rawRect.width * paddingRatio,
-      right: rawRect.right - rawRect.width * paddingRatio,
-      top: rawRect.top + rawRect.height * paddingRatio,
-      bottom: rawRect.bottom - rawRect.height * paddingRatio
-    };
-
-    const diceImgs = document.querySelectorAll(".dice");
-    let anyCovered = false;
-    diceImgs.forEach(dice => {
-      const diceRect = dice.getBoundingClientRect();
-      const centerX = diceRect.left + diceRect.width / 2;
-      const centerY = diceRect.top + diceRect.height / 2;
-
-      const isInside =
-        centerX >= bowlRect.left &&
-        centerX <= bowlRect.right &&
-        centerY >= bowlRect.top &&
-        centerY <= bowlRect.bottom;
-
-      if (isInside) anyCovered = true;
-    });
-
-    const messageElem = document.getElementById("message");
-    if (!anyCovered) {
-      let total = 0;
-      diceImgs.forEach(dice => {
-        const match = dice.src.match(/(\d)\.png$/);
-        if (match) total += parseInt(match[1]);
-      });
-
-      const result = total > 10 ? "🎲 Tài" : "🎲 Xỉu";
-      messageElem.style.display = "block";
-      messageElem.textContent = result;
-      messageElem.classList.remove("tai", "xiu");
-      messageElem.classList.add(result.includes("Tài") ? "tai" : "xiu");
-    } else {
-      messageElem.textContent = "";
-    }
-  }
-
-  function stopDrag() {
-    isDragging = false;
-    handle.style.cursor = "grab";
-    document.removeEventListener("mousemove", onDrag);
-    document.removeEventListener("mouseup", stopDrag);
-    document.removeEventListener("touchmove", onDrag);
-    document.removeEventListener("touchend", stopDrag);
-  }
-}
 
 
 
