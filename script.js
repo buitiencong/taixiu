@@ -348,7 +348,7 @@ function generateDiceFromTotal(total) {
 
 // LẮC ĐIỆN THOẠI ĐỂ LẮC XÚC XẮC
 let lastShakeTime = 0;
-const shakeThreshold = 25; // có thể chỉnh lên 30 nếu quá nhạy
+const shakeThreshold = 30; // có thể chỉnh lên 30 nếu quá nhạy
 const shakeCooldown = 2000; // ms
 
 function initShakeListener() {
