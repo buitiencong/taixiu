@@ -2,7 +2,8 @@ html, body {
   overscroll-behavior: none;
   overflow: hidden;
   height: 100%;
-  touch-action: none; /* Chặn vuốt xuống, zoom, double-tap */
+  /* touch-action: none; */
+  touch-action: manipulation;
 }
 
 
