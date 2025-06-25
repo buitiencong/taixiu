@@ -154,3 +154,7 @@ body {
   height: 28px;
   stroke: #333;
 }
+
+#icon-sound-off svg {
+  stroke: red;
+}
