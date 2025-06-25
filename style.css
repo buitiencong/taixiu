@@ -2,8 +2,7 @@ html, body {
   overscroll-behavior: none;
   overflow: hidden;
   height: 100%;
-  /* touch-action: none; */
-  touch-action: manipulation;
+  touch-action: none;
 }
 
 
