@@ -411,6 +411,7 @@ let isMuted = true;
 let audioContext = null;
 let rollBuffer = null;
 let hasLoadedAudio = false;
+let currentSource = null;
 
 function initAudio() {
   if (hasLoadedAudio) return;
@@ -439,11 +440,28 @@ function playRollSound() {
     return;
   }
 
+  // Nếu có âm thanh đang phát, dừng lại trước khi phát cái mới
+  if (currentSource) {
+    currentSource.stop();
+    currentSource.disconnect();
+    currentSource = null;
+  }
+
   const source = audioContext.createBufferSource();
   source.buffer = rollBuffer;
   source.connect(audioContext.destination);
   source.start(0);
+
+  currentSource = source;
+
+  // Khi phát xong, reset lại biến
+  source.onended = () => {
+    if (currentSource === source) {
+      currentSource = null;
+    }
+  };
 }
+
 
 // ✅ Đặt sau khi khai báo các hàm trên
 document.addEventListener("click", () => {
@@ -465,13 +483,18 @@ const iconSoundOff = document.getElementById("icon-sound-off");
 
 soundToggleBtn.addEventListener("click", () => {
   isMuted = !isMuted;
+
   iconSoundOn.style.display = isMuted ? "none" : "inline";
   iconSoundOff.style.display = isMuted ? "inline" : "none";
 
-  if (!isMuted && !hasLoadedAudio) {
-    initAudio(); // ✅ chỉ tải khi người dùng bật âm thanh
+  // Dừng ngay nếu đang phát mà bị mute
+  if (isMuted && currentSource) {
+    currentSource.stop();
+    currentSource.disconnect();
+    currentSource = null;
   }
 });
+
 
 
 // Load ảnh bát ngay từ đầu
