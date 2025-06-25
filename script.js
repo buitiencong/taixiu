@@ -406,14 +406,35 @@ function handleUserRoll() {
 
 
 // Phát âm thanh
-const rollSound = new Audio('sound.mp3');
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let rollBuffer = null;
+
+// Tải file âm thanh vào bộ nhớ
+fetch('sound.mp3')
+  .then(res => res.arrayBuffer())
+  .then(data => audioContext.decodeAudioData(data))
+  .then(buffer => {
+    rollBuffer = buffer;
+  })
+  .catch(err => {
+    console.error("Không thể tải âm thanh:", err);
+  });
+
+// Đảm bảo AudioContext hoạt động sau khi người dùng chạm
+document.addEventListener("click", () => {
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+});
+
 
 function playRollSound() {
-  if (isMuted) return; // ❌ Tắt tiếng thì không phát
-  rollSound.currentTime = 0;
-  rollSound.play().catch(err => {
-    console.warn("Không thể phát âm thanh:", err);
-  });
+  if (isMuted || !rollBuffer) return;
+
+  const source = audioContext.createBufferSource();
+  source.buffer = rollBuffer;
+  source.connect(audioContext.destination);
+  source.start(0);
 }
 
 
