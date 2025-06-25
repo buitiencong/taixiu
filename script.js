@@ -33,6 +33,17 @@ function rollDice() {
 
   bowl.onload = () => {
     area.appendChild(bowl);
+    // Căn giữa bát theo vùng dice-area
+    const areaRect = area.getBoundingClientRect();
+    const bowlWidth = bowl.offsetWidth;
+    const bowlHeight = bowl.offsetHeight;
+
+    const centerLeft = (area.offsetWidth - bowlWidth) / 2;
+    const centerTop = (area.offsetHeight - bowlHeight) / 2;
+
+    bowl.style.left = `${centerLeft}px`;
+    bowl.style.top = `${centerTop}px`;
+
 
     const plate = document.getElementById("plate");
     bowl.classList.add("shaking");

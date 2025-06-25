@@ -42,13 +42,12 @@ body {
 
 #bowl {
   position: absolute;
-  width: 100%;
+  width: 65%;     /* hoặc 260px tùy bạn */
   height: auto;
-  top: 0;
-  left: 0;
   cursor: grab;
-  z-index: 3; /* Nằm trên tất cả */
+  z-index: 3;
 }
+
 
 
 #message {
