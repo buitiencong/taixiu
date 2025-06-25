@@ -392,6 +392,9 @@ let hasRequestedMotionPermission = false;
 function handleUserRoll() {
   if (isRolling) return;
 
+  // Gọi ở đây là an toàn nhất
+  initAudio();
+
   if (!hasRequestedMotionPermission && typeof DeviceMotionEvent?.requestPermission === 'function') {
     DeviceMotionEvent.requestPermission().then(state => {
       if (state === 'granted') {
@@ -405,31 +408,39 @@ function handleUserRoll() {
 }
 
 
+
 // Phát âm thanh
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let isMuted = false;
+let audioContext = null;
 let rollBuffer = null;
+let hasLoadedAudio = false;
 
-// Tải file âm thanh vào bộ nhớ
-fetch('sound.mp3')
-  .then(res => res.arrayBuffer())
-  .then(data => audioContext.decodeAudioData(data))
-  .then(buffer => {
-    rollBuffer = buffer;
-  })
-  .catch(err => {
-    console.error("Không thể tải âm thanh:", err);
-  });
+function initAudio() {
+  if (hasLoadedAudio) return;
 
-// Đảm bảo AudioContext hoạt động sau khi người dùng chạm
-document.addEventListener("click", () => {
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
-});
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+  fetch('sound.mp3')
+    .then(res => res.arrayBuffer())
+    .then(data => audioContext.decodeAudioData(data))
+    .then(buffer => {
+      rollBuffer = buffer;
+      hasLoadedAudio = true;
+    })
+    .catch(err => {
+      console.error("Không thể tải âm thanh:", err);
+    });
+}
 
 function playRollSound() {
-  if (isMuted || !rollBuffer) return;
+  if (isMuted || !rollBuffer || !audioContext) return;
+
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      playRollSound(); // thử lại sau resume
+    });
+    return;
+  }
 
   const source = audioContext.createBufferSource();
   source.buffer = rollBuffer;
@@ -437,9 +448,18 @@ function playRollSound() {
   source.start(0);
 }
 
+// ✅ Đặt sau khi khai báo các hàm trên
+document.addEventListener("click", () => {
+  if (audioContext && audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+});
+
+
+
 
 // Bật tắt âm thanh
-let isMuted = false;
+
 
 // Gán sự kiện toggle âm thanh
 const soundToggleBtn = document.getElementById("sound-toggle");
