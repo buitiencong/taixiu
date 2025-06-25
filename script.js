@@ -118,7 +118,7 @@ function continueDiceRoll() {
     button.innerText = "Lắc";
     button.disabled = false;
     isRolling = false;
-  }, 2000);
+  }, 2200);
 }
 
 
