@@ -29,30 +29,36 @@ function rollDice() {
   bowl.style.position = "absolute";
   bowl.style.left = "0";
   bowl.style.top = "0";
-  bowl.style.pointerEvents = "none"; // không chặn chuột
+  bowl.style.pointerEvents = "none"; // không bắt sự kiện
   bowl.style.zIndex = "3";
 
   bowl.onload = () => {
     area.appendChild(bowl);
 
-    const rect = bowl.getBoundingClientRect();
+    // Lấy kích thước và vị trí thật sự của bowl trong vùng dice-area
+    const bowlRect = bowl.getBoundingClientRect();
     const areaRect = area.getBoundingClientRect();
 
-    // Tạo div vùng kéo hình tròn
+    const left = bowlRect.left - areaRect.left;
+    const top = bowlRect.top - areaRect.top;
+    const width = bowlRect.width;
+    const height = bowlRect.height;
+
+    // Tạo vùng kéo tương ứng
     const handle = document.createElement("div");
     handle.id = "bowl-handle";
     handle.style.position = "absolute";
-    handle.style.left = "0";
-    handle.style.top = "0";
-    handle.style.width = `${bowl.offsetWidth}px`;
-    handle.style.height = `${bowl.offsetHeight}px`;
-    handle.style.borderRadius = "50%";
+    handle.style.left = `${left}px`;
+    handle.style.top = `${top}px`;
+    handle.style.width = `${width}px`;
+    handle.style.height = `${height}px`;
+    handle.style.borderRadius = "50%"; // hình tròn/ellipse
     handle.style.cursor = "grab";
     handle.style.zIndex = "4";
     handle.style.background = "transparent";
     area.appendChild(handle);
 
-    // Gán kéo cho handle → kéo cả handle và bowl
+    // Gán sự kiện kéo cho handle
     makeDraggableBowlHandle(handle, bowl);
 
     // Rung bát và đĩa
@@ -70,6 +76,7 @@ function rollDice() {
     button.innerText = "Lắc lại";
   };
 }
+
 
 
 
@@ -172,13 +179,13 @@ function makeDraggableBowlHandle(handle, bowl) {
     let newLeft = clientX - rect.left - offsetX;
     let newTop = clientY - rect.top - offsetY;
 
-    // Cập nhật vị trí cả bowl và handle
+    // Cập nhật vị trí cho cả handle và ảnh bowl
     handle.style.left = `${newLeft}px`;
     handle.style.top = `${newTop}px`;
     bowl.style.left = `${newLeft}px`;
     bowl.style.top = `${newTop}px`;
 
-    // Kiểm tra che xúc xắc → hiển thị kết quả nếu không
+    // Kiểm tra che xúc xắc
     const rawRect = handle.getBoundingClientRect();
     const paddingRatio = 0.15;
     const bowlRect = {
@@ -231,6 +238,7 @@ function makeDraggableBowlHandle(handle, bowl) {
     document.removeEventListener("touchend", stopDrag);
   }
 }
+
 
 
 
