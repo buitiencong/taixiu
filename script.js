@@ -13,41 +13,64 @@ function rollDice() {
   messageElem.style.display = "none";
   messageElem.classList.remove("tai", "xiu");
 
-  // Đổi nội dung nút và disable
+  // Đổi nút
   button.innerText = "Đang lắc...";
   button.disabled = true;
 
   // Xoá xúc xắc và bát cũ
   area.querySelectorAll(".dice").forEach(d => d.remove());
-  const oldBowl = document.getElementById("bowl");
-  if (oldBowl) oldBowl.remove();
+  document.getElementById("bowl")?.remove();
+  document.getElementById("bowl-handle")?.remove();
 
-  // Tạo lại bát nhưng chờ ảnh load xong mới xử lý tiếp
+  // Tạo ảnh bát
   const bowl = document.createElement("img");
   bowl.src = "bat.png";
   bowl.id = "bowl";
   bowl.style.position = "absolute";
   bowl.style.left = "0";
   bowl.style.top = "0";
-  bowl.style.cursor = "not-allowed";
+  bowl.style.pointerEvents = "none"; // không chặn chuột
+  bowl.style.zIndex = "3";
 
   bowl.onload = () => {
     area.appendChild(bowl);
 
+    const rect = bowl.getBoundingClientRect();
+    const areaRect = area.getBoundingClientRect();
+
+    // Tạo div vùng kéo hình tròn
+    const handle = document.createElement("div");
+    handle.id = "bowl-handle";
+    handle.style.position = "absolute";
+    handle.style.left = "0";
+    handle.style.top = "0";
+    handle.style.width = `${bowl.offsetWidth}px`;
+    handle.style.height = `${bowl.offsetHeight}px`;
+    handle.style.borderRadius = "50%";
+    handle.style.cursor = "grab";
+    handle.style.zIndex = "4";
+    handle.style.background = "transparent";
+    area.appendChild(handle);
+
+    // Gán kéo cho handle → kéo cả handle và bowl
+    makeDraggableBowlHandle(handle, bowl);
+
+    // Rung bát và đĩa
     const plate = document.getElementById("plate");
     bowl.classList.add("shaking");
     if (plate) plate.classList.add("shaking");
 
-    continueDiceRoll(); // xử lý tiếp phần sau
+    continueDiceRoll(); // tiếp tục xử lý lắc
   };
 
   bowl.onerror = () => {
-    console.error("Không thể tải ảnh bat.png");
+    console.error("Không tải được bat.png");
     isRolling = false;
     button.disabled = false;
     button.innerText = "Lắc lại";
   };
 }
+
 
 
 function continueDiceRoll() {
@@ -110,7 +133,104 @@ function continueDiceRoll() {
   }, 3000);
 }
 
+// Tạo vùng chọn đè lên bát để bắt sự kiện di chuyển bát
+function makeDraggableBowlHandle(handle, bowl) {
+  let offsetX = 0, offsetY = 0;
+  let isDragging = false;
 
+  handle.addEventListener("mousedown", startDrag);
+  handle.addEventListener("touchstart", startDrag, { passive: false });
+
+  function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    handle.style.cursor = "grabbing";
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const rect = handle.getBoundingClientRect();
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
+
+    document.addEventListener("mousemove", onDrag);
+    document.addEventListener("mouseup", stopDrag);
+    document.addEventListener("touchmove", onDrag, { passive: false });
+    document.addEventListener("touchend", stopDrag);
+  }
+
+  function onDrag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const area = document.getElementById("dice-area");
+    const rect = area.getBoundingClientRect();
+
+    let newLeft = clientX - rect.left - offsetX;
+    let newTop = clientY - rect.top - offsetY;
+
+    // Cập nhật vị trí cả bowl và handle
+    handle.style.left = `${newLeft}px`;
+    handle.style.top = `${newTop}px`;
+    bowl.style.left = `${newLeft}px`;
+    bowl.style.top = `${newTop}px`;
+
+    // Kiểm tra che xúc xắc → hiển thị kết quả nếu không
+    const rawRect = handle.getBoundingClientRect();
+    const paddingRatio = 0.15;
+    const bowlRect = {
+      left: rawRect.left + rawRect.width * paddingRatio,
+      right: rawRect.right - rawRect.width * paddingRatio,
+      top: rawRect.top + rawRect.height * paddingRatio,
+      bottom: rawRect.bottom - rawRect.height * paddingRatio
+    };
+
+    const diceImgs = document.querySelectorAll(".dice");
+    let anyCovered = false;
+    diceImgs.forEach(dice => {
+      const diceRect = dice.getBoundingClientRect();
+      const centerX = diceRect.left + diceRect.width / 2;
+      const centerY = diceRect.top + diceRect.height / 2;
+
+      const isInside =
+        centerX >= bowlRect.left &&
+        centerX <= bowlRect.right &&
+        centerY >= bowlRect.top &&
+        centerY <= bowlRect.bottom;
+
+      if (isInside) anyCovered = true;
+    });
+
+    const messageElem = document.getElementById("message");
+    if (!anyCovered) {
+      let total = 0;
+      diceImgs.forEach(dice => {
+        const match = dice.src.match(/(\d)\.png$/);
+        if (match) total += parseInt(match[1]);
+      });
+
+      const result = total > 10 ? "🎲 Tài" : "🎲 Xỉu";
+      messageElem.style.display = "block";
+      messageElem.textContent = result;
+      messageElem.classList.remove("tai", "xiu");
+      messageElem.classList.add(result.includes("Tài") ? "tai" : "xiu");
+    } else {
+      messageElem.textContent = "";
+    }
+  }
+
+  function stopDrag() {
+    isDragging = false;
+    handle.style.cursor = "grab";
+    document.removeEventListener("mousemove", onDrag);
+    document.removeEventListener("mouseup", stopDrag);
+    document.removeEventListener("touchmove", onDrag);
+    document.removeEventListener("touchend", stopDrag);
+  }
+}
 
 
 
