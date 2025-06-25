@@ -1,9 +1,9 @@
 let isRolling = false;  // Đang lắc hay không
 
 function rollDice() {
-  if (isRolling) return;  // Ngăn lắc chồng
+  if (isRolling) return;
   isRolling = true;
-  playRollSound(); // ✅ phát âm thanh
+  playRollSound();
 
   const button = document.getElementById("roll-button");
   const area = document.getElementById("dice-area");
@@ -22,7 +22,7 @@ function rollDice() {
   const oldBowl = document.getElementById("bowl");
   if (oldBowl) oldBowl.remove();
 
-  // Tạo lại bát (hiện ngay)
+  // Tạo lại bát nhưng chờ ảnh load xong mới xử lý tiếp
   const bowl = document.createElement("img");
   bowl.src = "bat.png";
   bowl.id = "bowl";
@@ -30,14 +30,30 @@ function rollDice() {
   bowl.style.left = "0";
   bowl.style.top = "0";
   bowl.style.cursor = "not-allowed";
-  area.appendChild(bowl);
 
-  // Cho bát và đĩa rung nhẹ
-  const plate = document.getElementById("plate");
-  bowl.classList.add("shaking");
-  if (plate) plate.classList.add("shaking");
+  bowl.onload = () => {
+    area.appendChild(bowl);
 
-  // Sinh kết quả theo xác suất
+    const plate = document.getElementById("plate");
+    bowl.classList.add("shaking");
+    if (plate) plate.classList.add("shaking");
+
+    continueDiceRoll(); // xử lý tiếp phần sau
+  };
+
+  bowl.onerror = () => {
+    console.error("Không thể tải ảnh bat.png");
+    isRolling = false;
+    button.disabled = false;
+    button.innerText = "Lắc lại";
+  };
+}
+
+
+function continueDiceRoll() {
+  const area = document.getElementById("dice-area");
+  const button = document.getElementById("roll-button");
+
   const taiChance = parseInt(document.getElementById("prob-slider").value);
   let total;
   if (Math.random() * 100 < taiChance) {
@@ -58,7 +74,6 @@ function rollDice() {
 
   const diceValues = generateDiceFromTotal(total);
 
-  // Sau 5 giây: hiển thị xúc xắc
   setTimeout(() => {
     for (let i = 0; i < 3; i++) {
       const num = diceValues[i];
@@ -81,20 +96,20 @@ function rollDice() {
       makeDraggableDice(dice);
     }
 
-    // Dừng rung
-    bowl.classList.remove("shaking");
+    const bowl = document.getElementById("bowl");
+    const plate = document.getElementById("plate");
+    if (bowl) bowl.classList.remove("shaking");
     if (plate) plate.classList.remove("shaking");
 
-    // Cho phép kéo bát
     bowl.style.cursor = "grab";
     makeDraggableBowl(bowl);
 
-    // Trả lại nút
     button.innerText = "Lắc";
     button.disabled = false;
     isRolling = false;
   }, 3000);
 }
+
 
 
 
