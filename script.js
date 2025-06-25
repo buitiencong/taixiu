@@ -22,15 +22,33 @@ function rollDice() {
   const oldBowl = document.getElementById("bowl");
   if (oldBowl) oldBowl.remove();
 
-  // Tạo lại bát (hiện ngay)
-  const bowl = document.createElement("img");
-  bowl.src = "bat.png";
+  // Tạo ảnh bát
+  const bowlImg = document.createElement("img");
+  bowlImg.src = "bat.png";
+  bowlImg.id = "bowl-img";
+  bowlImg.style.position = "absolute";
+  bowlImg.style.left = "0";
+  bowlImg.style.top = "0";
+  bowlImg.style.zIndex = "3";
+  bowlImg.style.pointerEvents = "none"; // ❌ không chặn sự kiện
+  area.appendChild(bowlImg);
+
+  // Tạo lớp kéo bát
+  const bowl = document.createElement("div");
   bowl.id = "bowl";
   bowl.style.position = "absolute";
   bowl.style.left = "0";
   bowl.style.top = "0";
+  bowl.style.width = "100%";
+  bowl.style.height = "100%";
   bowl.style.cursor = "not-allowed";
+  bowl.style.zIndex = "4";
   area.appendChild(bowl);
+
+  // Cho bát và đĩa rung
+  bowlImg.classList.add("shaking");
+  if (plate) plate.classList.add("shaking");
+
 
   // Cho bát và đĩa rung nhẹ
   const plate = document.getElementById("plate");
@@ -251,28 +269,23 @@ function makeDraggableDice(elem) {
   elem.addEventListener("mousedown", startDrag);
   elem.addEventListener("touchstart", startDrag, { passive: false });
 
-function startDrag(e) {
-  e.preventDefault();
-  isDragging = true;
-  elem.style.cursor = "grabbing";
+  function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    elem.style.cursor = "grabbing";
 
-  // ✅ Tạm bỏ pointer bát
-  const bowl = document.getElementById("bowl");
-  if (bowl) bowl.classList.add("ignore-pointer");
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const rect = elem.getBoundingClientRect();
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
 
-  const rect = elem.getBoundingClientRect();
-  offsetX = clientX - rect.left;
-  offsetY = clientY - rect.top;
-
-  document.addEventListener("mousemove", onDrag);
-  document.addEventListener("mouseup", stopDrag);
-  document.addEventListener("touchmove", onDrag, { passive: false });
-  document.addEventListener("touchend", stopDrag);
-}
-
+    document.addEventListener("mousemove", onDrag);
+    document.addEventListener("mouseup", stopDrag);
+    document.addEventListener("touchmove", onDrag, { passive: false });
+    document.addEventListener("touchend", stopDrag);
+  }
 
   function onDrag(e) {
     if (!isDragging) return;
@@ -295,20 +308,14 @@ function startDrag(e) {
     elem.style.top = `${y}px`;
   }
 
-function stopDrag() {
-  isDragging = false;
-  elem.style.cursor = "grab";
-
-  // ✅ Khôi phục pointer cho bát
-  const bowl = document.getElementById("bowl");
-  if (bowl) bowl.classList.remove("ignore-pointer");
-
-  document.removeEventListener("mousemove", onDrag);
-  document.removeEventListener("mouseup", stopDrag);
-  document.removeEventListener("touchmove", onDrag);
-  document.removeEventListener("touchend", stopDrag);
-}
-
+  function stopDrag() {
+    isDragging = false;
+    elem.style.cursor = "grab";
+    document.removeEventListener("mousemove", onDrag);
+    document.removeEventListener("mouseup", stopDrag);
+    document.removeEventListener("touchmove", onDrag);
+    document.removeEventListener("touchend", stopDrag);
+  }
 }
 
 
