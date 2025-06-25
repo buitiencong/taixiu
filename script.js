@@ -406,39 +406,15 @@ function handleUserRoll() {
 
 
 // Phát âm thanh
-// const rollSound = new Audio('sound.mp3');
-let audioCtx;
-let rollBuffer;
-
-async function loadSoundEffect() {
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const response = await fetch('sound.mp3');
-    const arrayBuffer = await response.arrayBuffer();
-    rollBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-  } catch (err) {
-    console.warn("Không thể load âm thanh:", err);
-  }
-}
+const rollSound = new Audio('sound.mp3');
 
 function playRollSound() {
-  if (isMuted || !rollBuffer || !audioCtx) return;
-
-  // Safari iOS yêu cầu gọi resume() để kích hoạt context sau tương tác người dùng
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume().then(() => actuallyPlay());
-  } else {
-    actuallyPlay();
-  }
-
-  function actuallyPlay() {
-    const source = audioCtx.createBufferSource();
-    source.buffer = rollBuffer;
-    source.connect(audioCtx.destination);
-    source.start(0);
-  }
+  if (isMuted) return; // ❌ Tắt tiếng thì không phát
+  rollSound.currentTime = 0;
+  rollSound.play().catch(err => {
+    console.warn("Không thể phát âm thanh:", err);
+  });
 }
-
 
 
 // Bật tắt âm thanh
@@ -484,6 +460,4 @@ window.addEventListener("load", () => {
 
     area.appendChild(bowl);
   }
-  loadSoundEffect();
-
 });
