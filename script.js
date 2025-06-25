@@ -237,7 +237,7 @@ function makeDraggableBowl(elem) {
         if (match) total += parseInt(match[1]);
       });
 
-      const result = total > 10 ? "🎲 Tài" : "🎲 Xỉu";
+      const result = total > 10 ? "🎲 Tài" : "🎲 Chưa tài đâu";
       messageElem.style.display = "block";
       messageElem.textContent = result;
 
