@@ -23,27 +23,14 @@ function rollDice() {
   if (oldBowl) oldBowl.remove();
 
   // Tạo lại bát (hiện ngay)
-  // const bowl = document.createElement("img");
-  // bowl.src = "bat.png";
-  // bowl.id = "bowl";
-  // bowl.style.position = "absolute";
-  // bowl.style.left = "0";
-  // bowl.style.top = "0";
-  // bowl.style.cursor = "not-allowed";
-  // area.appendChild(bowl);
-
-  const bowlImg = document.createElement("img");
-bowlImg.src = "bat.png";
-bowlImg.id = "bowl-img";
-bowlImg.style.position = "absolute";
-bowlImg.style.left = "0";
-bowlImg.style.top = "0";
-bowlImg.style.width = "100%";
-bowlImg.style.height = "100%"; // ✅ Thêm dòng này để khớp với đĩa
-bowlImg.style.zIndex = "3";
-bowlImg.style.pointerEvents = "none";
-area.appendChild(bowlImg);
-
+  const bowl = document.createElement("img");
+  bowl.src = "bat.png";
+  bowl.id = "bowl";
+  bowl.style.position = "absolute";
+  bowl.style.left = "0";
+  bowl.style.top = "0";
+  bowl.style.cursor = "not-allowed";
+  area.appendChild(bowl);
 
   // Cho bát và đĩa rung nhẹ
   const plate = document.getElementById("plate");
@@ -95,19 +82,18 @@ area.appendChild(bowlImg);
     }
 
     // Dừng rung
-const bowlImg = document.getElementById("bowl-img");
-if (bowlImg) bowlImg.classList.remove("shaking");
-if (plate) plate.classList.remove("shaking");
+    bowl.classList.remove("shaking");
+    if (plate) plate.classList.remove("shaking");
 
-// Cho phép kéo bát
-bowl.style.cursor = "grab";
-makeDraggableBowl(bowl);
+    // Cho phép kéo bát
+    bowl.style.cursor = "grab";
+    makeDraggableBowl(bowl);
 
-// Trả lại nút
-button.innerText = "Lắc";
-button.disabled = false;
-isRolling = false;
-
+    // Trả lại nút
+    button.innerText = "Lắc";
+    button.disabled = false;
+    isRolling = false;
+  }, 3000);
 }
 
 

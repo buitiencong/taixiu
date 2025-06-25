@@ -48,13 +48,7 @@ body {
   left: 0;
   cursor: grab;
   z-index: 3; /* Nằm trên tất cả */
-  background: transparent;
 }
-
-#bowl-img {
-  pointer-events: none;
-}
-
 
 
 #message {
