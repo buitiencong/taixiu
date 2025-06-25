@@ -392,9 +392,6 @@ let hasRequestedMotionPermission = false;
 function handleUserRoll() {
   if (isRolling) return;
 
-  // Gọi ở đây là an toàn nhất
-  initAudio();
-
   if (!hasRequestedMotionPermission && typeof DeviceMotionEvent?.requestPermission === 'function') {
     DeviceMotionEvent.requestPermission().then(state => {
       if (state === 'granted') {
@@ -410,7 +407,7 @@ function handleUserRoll() {
 
 
 // Phát âm thanh
-let isMuted = false;
+let isMuted = true;
 let audioContext = null;
 let rollBuffer = null;
 let hasLoadedAudio = false;
@@ -470,7 +467,12 @@ soundToggleBtn.addEventListener("click", () => {
   isMuted = !isMuted;
   iconSoundOn.style.display = isMuted ? "none" : "inline";
   iconSoundOff.style.display = isMuted ? "inline" : "none";
+
+  if (!isMuted && !hasLoadedAudio) {
+    initAudio(); // ✅ chỉ tải khi người dùng bật âm thanh
+  }
 });
+
 
 // Load ảnh bát ngay từ đầu
 window.addEventListener("load", () => {
