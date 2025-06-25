@@ -111,29 +111,49 @@ function makeDraggableBowl(elem) {
   elem.addEventListener("mousedown", startDrag);
   elem.addEventListener("touchstart", startDrag, { passive: false });
 
-  function startDrag(e) {
-    e.preventDefault();
-    isDragging = true;
-    elem.style.cursor = "grabbing";
+  const testCanvas = document.createElement("canvas");
+  const testCtx = testCanvas.getContext("2d");
 
-    // Lấy vị trí con trỏ chuột hoặc chạm
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    function startDrag(e) {
+      e.preventDefault();
 
-    // Lấy bounding rect của element (vị trí tuyệt đối trên viewport)
-    const rect = elem.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    // Tính offset = khoảng cách con trỏ chuột so với góc trên trái của ảnh
-    offsetX = clientX - rect.left;
-    offsetY = clientY - rect.top;
+      // Tính vị trí tương đối trong ảnh
+      const rect = elem.getBoundingClientRect();
+      const relX = clientX - rect.left;
+      const relY = clientY - rect.top;
 
-    // Đăng ký event listener trên document để theo dõi kéo chuột/di chuyển
-    document.addEventListener("mousemove", onDrag);
-    document.addEventListener("mouseup", stopDrag);
-    document.addEventListener("touchmove", onDrag, { passive: false });
-    document.addEventListener("touchend", stopDrag);
-  }
+      // Chuẩn bị canvas cùng kích thước
+      testCanvas.width = elem.naturalWidth;
+      testCanvas.height = elem.naturalHeight;
+      testCtx.clearRect(0, 0, testCanvas.width, testCanvas.height);
+      testCtx.drawImage(elem, 0, 0);
 
+      // Tính toạ độ trên ảnh gốc (vì ảnh có thể bị scale)
+      const scaleX = elem.naturalWidth / elem.offsetWidth;
+      const scaleY = elem.naturalHeight / elem.offsetHeight;
+      const imgX = Math.floor(relX * scaleX);
+      const imgY = Math.floor(relY * scaleY);
+
+      const pixel = testCtx.getImageData(imgX, imgY, 1, 1).data;
+
+      // pixel[3] = alpha, nếu bằng 0 thì là trong suốt
+      if (pixel[3] === 0) return; // ❌ Không kéo nếu bấm vào phần trong suốt
+
+      // Nếu hợp lệ, bắt đầu kéo
+      isDragging = true;
+      elem.style.cursor = "grabbing";
+
+      offsetX = relX;
+      offsetY = relY;
+
+      document.addEventListener("mousemove", onDrag);
+      document.addEventListener("mouseup", stopDrag);
+      document.addEventListener("touchmove", onDrag, { passive: false });
+      document.addEventListener("touchend", stopDrag);
+    }
 
     function onDrag(e) {
     if (!isDragging) return;
