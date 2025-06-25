@@ -430,3 +430,34 @@ soundToggleBtn.addEventListener("click", () => {
   iconSoundOn.style.display = isMuted ? "none" : "inline";
   iconSoundOff.style.display = isMuted ? "inline" : "none";
 });
+
+// Load ảnh bát ngay từ đầu
+window.addEventListener("load", () => {
+  const area = document.getElementById("dice-area");
+
+  // Nếu chưa có bát, thêm bát vào
+  if (!document.getElementById("bowl")) {
+    const bowl = document.createElement("img");
+    bowl.src = "bat.png";
+    bowl.id = "bowl";
+    bowl.style.position = "absolute";
+    bowl.style.cursor = "grab";
+    bowl.style.zIndex = "3";
+    bowl.style.width = "65%";
+    bowl.style.height = "auto";
+
+    bowl.onload = () => {
+      // Căn giữa
+      const bowlWidth = bowl.offsetWidth;
+      const bowlHeight = bowl.offsetHeight;
+      const centerLeft = (area.offsetWidth - bowlWidth) / 2;
+      const centerTop = (area.offsetHeight - bowlHeight) / 2;
+      bowl.style.left = `${centerLeft}px`;
+      bowl.style.top = `${centerTop}px`;
+
+      makeDraggableBowl(bowl);
+    };
+
+    area.appendChild(bowl);
+  }
+});
