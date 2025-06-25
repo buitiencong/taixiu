@@ -363,10 +363,24 @@ function handleUserRoll() {
 const rollSound = new Audio('sound.mp3');
 
 function playRollSound() {
-  rollSound.currentTime = 0; // Đảm bảo âm thanh phát lại từ đầu
+  if (isMuted) return; // ❌ Tắt tiếng thì không phát
+  rollSound.currentTime = 0;
   rollSound.play().catch(err => {
-    // iOS có thể chặn nếu chưa có tương tác người dùng
     console.warn("Không thể phát âm thanh:", err);
   });
 }
 
+
+// Bật tắt âm thanh
+let isMuted = false;
+
+// Gán sự kiện toggle âm thanh
+const soundToggleBtn = document.getElementById("sound-toggle");
+const iconSoundOn = document.getElementById("icon-sound-on");
+const iconSoundOff = document.getElementById("icon-sound-off");
+
+soundToggleBtn.addEventListener("click", () => {
+  isMuted = !isMuted;
+  iconSoundOn.style.display = isMuted ? "none" : "inline";
+  iconSoundOff.style.display = isMuted ? "inline" : "none";
+});
