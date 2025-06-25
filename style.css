@@ -50,6 +50,11 @@ body {
   z-index: 3; /* Nằm trên tất cả */
 }
 
+#bowl.ignore-pointer {
+  pointer-events: none;
+}
+
+
 #message {
   font-size: 28px;
   font-weight: bold;

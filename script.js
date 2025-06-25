@@ -251,23 +251,28 @@ function makeDraggableDice(elem) {
   elem.addEventListener("mousedown", startDrag);
   elem.addEventListener("touchstart", startDrag, { passive: false });
 
-  function startDrag(e) {
-    e.preventDefault();
-    isDragging = true;
-    elem.style.cursor = "grabbing";
+function startDrag(e) {
+  e.preventDefault();
+  isDragging = true;
+  elem.style.cursor = "grabbing";
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  // ✅ Tạm bỏ pointer bát
+  const bowl = document.getElementById("bowl");
+  if (bowl) bowl.classList.add("ignore-pointer");
 
-    const rect = elem.getBoundingClientRect();
-    offsetX = clientX - rect.left;
-    offsetY = clientY - rect.top;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    document.addEventListener("mousemove", onDrag);
-    document.addEventListener("mouseup", stopDrag);
-    document.addEventListener("touchmove", onDrag, { passive: false });
-    document.addEventListener("touchend", stopDrag);
-  }
+  const rect = elem.getBoundingClientRect();
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+
+  document.addEventListener("mousemove", onDrag);
+  document.addEventListener("mouseup", stopDrag);
+  document.addEventListener("touchmove", onDrag, { passive: false });
+  document.addEventListener("touchend", stopDrag);
+}
+
 
   function onDrag(e) {
     if (!isDragging) return;
@@ -290,14 +295,20 @@ function makeDraggableDice(elem) {
     elem.style.top = `${y}px`;
   }
 
-  function stopDrag() {
-    isDragging = false;
-    elem.style.cursor = "grab";
-    document.removeEventListener("mousemove", onDrag);
-    document.removeEventListener("mouseup", stopDrag);
-    document.removeEventListener("touchmove", onDrag);
-    document.removeEventListener("touchend", stopDrag);
-  }
+function stopDrag() {
+  isDragging = false;
+  elem.style.cursor = "grab";
+
+  // ✅ Khôi phục pointer cho bát
+  const bowl = document.getElementById("bowl");
+  if (bowl) bowl.classList.remove("ignore-pointer");
+
+  document.removeEventListener("mousemove", onDrag);
+  document.removeEventListener("mouseup", stopDrag);
+  document.removeEventListener("touchmove", onDrag);
+  document.removeEventListener("touchend", stopDrag);
+}
+
 }
 
 
