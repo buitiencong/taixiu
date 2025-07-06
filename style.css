@@ -37,6 +37,8 @@ body {
   z-index: 1;
   pointer-events: none;
   user-select: none;
+  /* Bóng đổ theo hình thực tế (PNG trong suốt) */
+  filter: drop-shadow(10px 16px 10px rgba(0, 0, 0, 0.4));
 }
 
 
