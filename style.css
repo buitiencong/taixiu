@@ -56,7 +56,6 @@ body {
   height: auto;
   cursor: grab;
   z-index: 3;
-  filter: drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.4));
 }
 
 
